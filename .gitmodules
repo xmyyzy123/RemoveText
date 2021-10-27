@@ -1,6 +1,0 @@
-[submodule "PaddleOCR"]
-	path = PaddleOCR
-	url = https://github.com/xmyyzy123/PaddleOCR.git
-[submodule "lama"]
-	path = lama
-	url = https://github.com/xmyyzy123/lama.git

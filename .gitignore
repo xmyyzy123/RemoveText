@@ -1,0 +1,9 @@
+ch_ppocr_mobile_v2.0_cls_infer
+ch_ppocr_server_v2.0_det_infer
+ch_PP-OCRv2_rec_infer
+det_r50_vd_inference
+envs
+
+*.ckpt
+
+__pycache__

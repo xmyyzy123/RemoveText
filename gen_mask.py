@@ -5,22 +5,30 @@ import cv2
 import numpy as np
 import shutil
 
-original_img_path = '/path/to/your/images/folder'
 ocr_det_model_dir = './det_r50_vd_inference'
+result_img_path = './original_img_and_mask'
 
-result_img_path = '/path/to/RemoveText/lama/original_and_mask'
+# for PaddleOCR constructor, but not used
+ocr_cls_model_dir = './ch_ppocr_mobile_v2.0_cls_infer'
+ocr_rec_model_dir = './ch_PP-OCRv2_rec_infer'
 
-if os.path.exists(result_img_path):
-    shutil.rmtree(result_img_path)
-os.makedirs(result_img_path)  
+def ocr_img_mask(original_img_path, window):
+    if os.path.exists(result_img_path):
+        shutil.rmtree(result_img_path)
+    os.makedirs(result_img_path) 
 
-def ocr_img_mask():
     print("start get img and mask")
     # Paddleocr目前支持的多语言语种可以通过修改lang参数进行切换
     # 例如`ch`, `en`, `fr`, `german`, `korean`, `japan`
-    ocr = PaddleOCR(det_model_dir=ocr_det_model_dir, use_angle_cls=False, lang="ch")  # need to run only once to download and load model into memory
-
-    for img_path in glob.glob(original_img_path + '/*.jpg'):
+    # ocr = PaddleOCR(det_model_dir=ocr_det_model_dir, use_angle_cls=False, lang="ch")  # need to run only once to download and load model into memory
+    ocr = PaddleOCR(det_model_dir=ocr_det_model_dir,
+                    cls_model_dir=ocr_cls_model_dir,
+                    rec_model_dir=ocr_rec_model_dir,
+                    use_angle_cls=False, lang="ch")
+    imgs_path = glob.glob(original_img_path + '/*.jpg')
+    num = len(imgs_path)
+    i = 0
+    for img_path in imgs_path:
         img_name = img_path.split('/')[-1]
         result = ocr.ocr(img_path, cls=False)
         # for line in result:
@@ -54,14 +62,19 @@ def ocr_img_mask():
         # write mask
         mask_name = os.path.join(result_img_path, img_name.split('.')[0]+'_mask.jpg')
         cv2.imwrite(mask_name, mask)
+        i += 1
+        window.write_event_value('-PROGRESS-', i / num * 25)
 
+    i = 0
     for img_path in glob.glob(original_img_path + '/*.jpg'):
         img_name = img_path.split('/')[-1]
         # copy original img
         shutil.copy(img_path, os.path.join(result_img_path, img_name))
+        i += 1
+        window.write_event_value('-PROGRESS-', 25 + i / num * 25)
+    
+    window.write_event_value('-OCR THREAD-', result_img_path)
 
-    return
-
-if __name__ == "__main__":
-    ocr_img_mask()
-    print("Finish!")
+# if __name__ == "__main__":
+#     ocr_img_mask()
+#     print("Finish!")
