@@ -2,7 +2,7 @@
 **流程：文字检测(PaddleOCR) -> 掩膜(Mask) -> 图像修复(Image Inpainting)**
 
 ****
-快速开始：
+## 快速开始：
 [部署](https://github.com/xmyyzy123/RemoveText/tree/release-1.0)
 
 ****
